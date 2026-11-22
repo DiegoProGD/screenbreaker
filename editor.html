@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>ScreenBreaker Editor</title>
 
 <style>
-
 :root{
 --bg:#f5f3ef;
 --paper:#fffefa;
@@ -17,10 +16,14 @@
 --line:#e7e1d9;
 }
 
+*{
+box-sizing:border-box;
+}
+
 body{
 margin:0;
 background:var(--bg);
-font-family:system-ui;
+font-family:system-ui,sans-serif;
 color:var(--ink);
 }
 
@@ -28,6 +31,12 @@ main{
 width:min(900px,calc(100% - 30px));
 margin:auto;
 padding:20px;
+}
+
+h1{
+font-family:Georgia,serif;
+font-weight:500;
+text-align:center;
 }
 
 .card{
@@ -38,24 +47,20 @@ padding:20px;
 margin-bottom:20px;
 }
 
-h1{
-font-family:Georgia,serif;
-font-weight:500;
-text-align:center;
-}
-
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
 gap:10px;
 }
 
-input,select,textarea{
+input,
+select,
+textarea{
 width:100%;
 padding:12px;
 border:1px solid var(--line);
 border-radius:12px;
-box-sizing:border-box;
+font:inherit;
 }
 
 button{
@@ -74,7 +79,7 @@ opacity:.9;
 #timeDisplay{
 font-size:2rem;
 text-align:center;
-margin-bottom:15px;
+margin-bottom:10px;
 }
 
 #screens{
@@ -84,8 +89,8 @@ margin-top:15px;
 }
 
 .screen{
-background:#ece7e0;
 height:120px;
+background:#ece7e0;
 border-radius:16px;
 display:flex;
 justify-content:center;
@@ -93,6 +98,7 @@ align-items:center;
 font-weight:bold;
 cursor:pointer;
 user-select:none;
+transition:.15s;
 }
 
 .screen:hover{
@@ -112,12 +118,19 @@ padding:10px;
 }
 
 textarea{
-height:150px;
+height:160px;
 font-family:monospace;
 }
 
+.actions{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+margin-top:10px;
+}
 </style>
 </head>
+
 <body>
 
 <main>
@@ -129,7 +142,7 @@ font-family:monospace;
 <div class="grid">
 
 <div>
-<label>Name</label>
+<label>Level Name</label>
 <input id="name" value="My Level">
 </div>
 
@@ -142,16 +155,23 @@ font-family:monospace;
 <label>Sections</label>
 
 <select id="sections">
-
 <option>1</option>
 <option>2</option>
 <option>3</option>
 <option selected>4</option>
 <option>5</option>
 <option>6</option>
-
 </select>
 
+</div>
+
+<div>
+<label>Level Length (seconds)</label>
+<input
+id="levelLength"
+type="number"
+value="60"
+min="1">
 </div>
 
 <div>
@@ -160,8 +180,16 @@ font-family:monospace;
 id="reaction"
 type="number"
 step="0.1"
-value="1"
->
+value="1">
+</div>
+
+<div>
+<label>Practice Start</label>
+<input
+id="practiceStart"
+type="number"
+step="0.1"
+value="0">
 </div>
 
 </div>
@@ -171,9 +199,7 @@ value="1"
 <div class="card">
 
 <div id="timeDisplay">
-
-0.0s
-
+0.0s / 60s
 </div>
 
 <input
@@ -182,8 +208,7 @@ type="range"
 min="0"
 max="60"
 step="0.1"
-value="0"
->
+value="0">
 
 <br><br>
 
@@ -206,7 +231,7 @@ id="holdDuration"
 type="number"
 step="0.1"
 value="1"
->
+placeholder="Hold Duration">
 
 </div>
 
@@ -232,10 +257,9 @@ value="1"
 
 <textarea
 id="code"
-readonly
-></textarea>
+readonly></textarea>
 
-<br><br>
+<div class="actions">
 
 <button onclick="generateCode()">
 Generate Code
@@ -245,42 +269,45 @@ Generate Code
 Copy Code
 </button>
 
+<button onclick="saveProject()">
+Save Project
+</button>
+
+<input
+type="file"
+id="loader"
+hidden>
+
+<button onclick="loader.click()">
+Load Project
+</button>
+
 </div>
 
-</main>
+</div>
 
 <script>
 
-const events=[];
+const events = [];
 
 function buildScreens(){
 
-const count=
-Number(
-document
-.getElementById(
-"sections"
-)
-.value
-);
+const count =
+Number(sections.value);
 
-const screens=
-document
-.getElementById(
+const screens =
+document.getElementById(
 "screens"
 );
 
 screens.innerHTML="";
 
-let cols=2;
+let cols = 2;
 
-if(count<=3)
-cols=count;
+if(count<=3) cols=count;
+if(count>=5) cols=3;
 
-if(count>=5)
-cols=3;
-
-screens.style.gridTemplateColumns=
+screens.style.gridTemplateColumns =
 `repeat(${cols},1fr)`;
 
 for(
@@ -289,38 +316,32 @@ i<=count;
 i++
 ){
 
-const div=
+const div =
 document.createElement(
 "div"
 );
 
-div.className=
+div.className =
 "screen";
 
-div.textContent=
-"Screen "+i;
+div.textContent =
+"Screen " + i;
 
-div.onclick=
-()=>addEvent(i);
+div.onclick =
+()=> addEvent(i);
 
-screens.appendChild(
-div
-);
+screens.appendChild(div);
 
 }
 
 }
 
-function addEvent(screen){
+  function addEvent(screen){
 
 events.push({
 
 time:Number(
-document
-.getElementById(
-"timeline"
-)
-.value
+timeline.value
 ),
 
 screen,
@@ -338,6 +359,7 @@ document
 "holdDuration"
 )
 .value
+
 )
 
 });
@@ -348,7 +370,7 @@ renderEvents();
 
 function renderEvents(){
 
-const container=
+const container =
 document.getElementById(
 "events"
 );
@@ -356,36 +378,53 @@ document.getElementById(
 container.innerHTML="";
 
 events.sort(
-(a,b)=>a.time-b.time
+(a,b)=>
+a.time-b.time
 );
 
 events.forEach(
 (event,index)=>{
 
-const div=
+const div =
 document.createElement(
 "div"
 );
 
-div.className=
+div.className =
 "event";
 
-div.innerHTML=`
+div.innerHTML =
+
+`
+<strong>
 ${event.time}s
+</strong>
+
 •
 Screen ${event.screen}
+
 •
-${event.type==="H"?"Hold":"Normal"}
+${
+event.type === "H"
+?
+`Hold (${event.duration}s)`
+:
+"Normal"
+}
 
 <button
-style="float:right"
+style="
+float:right;
+background:#c44;
+"
 onclick="
-removeEvent(
-${index}
-)
+removeEvent(${index})
 ">
+
 Delete
+
 </button>
+
 `;
 
 container.appendChild(
@@ -406,9 +445,33 @@ renderEvents();
 
 function generateCode(){
 
-const code=
+const code =
 
-`SB1|${name.value}|${color.value}|${sections.value}|${reaction.value}|`
+`SB1|`
+
++
+
+`${name.value}|`
+
++
+
+`${color.value}|`
+
++
+
+`${sections.value}|`
+
++
+
+`${levelLength.value}|`
+
++
+
+`${reaction.value}|`
+
++
+
+`${practiceStart.value}|`
 
 +
 
@@ -424,7 +487,7 @@ document
 .getElementById(
 "code"
 )
-.value=
+.value =
 code;
 
 }
@@ -433,12 +496,15 @@ function copyCode(){
 
 generateCode();
 
-navigator.clipboard.writeText(
+navigator.clipboard
+.writeText(
+
 document
 .getElementById(
 "code"
 )
 .value
+
 );
 
 alert(
@@ -447,20 +513,183 @@ alert(
 
 }
 
-timeline.addEventListener(
-"input",
-()=>{
-timeDisplay.textContent=
-timeline.value+"s";
+function saveProject(){
+
+const data = {
+
+name:
+name.value,
+
+color:
+color.value,
+
+sections:
+sections.value,
+
+levelLength:
+levelLength.value,
+
+reaction:
+reaction.value,
+
+practiceStart:
+practiceStart.value,
+
+events
+
+};
+
+const blob =
+new Blob(
+
+[
+JSON.stringify(
+data,
+null,
+2
+)
+],
+
+{
+type:
+"application/json"
 }
+
 );
 
-sections.addEventListener(
+const a =
+document.createElement(
+"a"
+);
+
+a.href =
+URL.createObjectURL(
+blob
+);
+
+a.download =
+`${name.value}.json`;
+
+a.click();
+
+}
+
+loader.addEventListener(
+
 "change",
-buildScreens
+
+event=>{
+
+const file =
+event.target.files[0];
+
+if(!file)
+return;
+
+const reader =
+new FileReader();
+
+reader.onload =
+()=>{
+
+const data =
+
+JSON.parse(
+reader.result
+);
+
+name.value =
+data.name;
+
+color.value =
+data.color;
+
+sections.value =
+data.sections;
+
+levelLength.value =
+data.levelLength;
+
+reaction.value =
+data.reaction;
+
+practiceStart.value =
+data.practiceStart;
+
+events.length = 0;
+
+data.events.forEach(
+e=>events.push(e)
 );
 
 buildScreens();
+
+renderEvents();
+
+updateTimelineRange();
+
+};
+
+reader.readAsText(
+file
+);
+
+}
+
+);
+
+function updateTimelineRange(){
+
+timeline.max =
+levelLength.value;
+
+updateTimeDisplay();
+
+}
+
+function updateTimeDisplay(){
+
+timeDisplay.textContent =
+
+timeline.value +
+
+"s / " +
+
+levelLength.value +
+
+"s";
+
+}
+
+timeline.addEventListener(
+
+"input",
+
+updateTimeDisplay
+
+);
+
+levelLength.addEventListener(
+
+"input",
+
+updateTimelineRange
+
+);
+
+sections.addEventListener(
+
+"change",
+
+buildScreens
+
+);
+
+buildScreens();
+
+updateTimelineRange();
+
+renderEvents();
 
 </script>
 
