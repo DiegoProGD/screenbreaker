@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ScreenBreaker</title>
+
+<style>
+:root{
+  --bg:#f5f3ef;
+  --paper:#fffefa;
+  --ink:#252525;
+  --muted:#77736d;
+  --accent:#7657a5;
+  --accent-light:#eee8f6;
+  --line:#e7e1d9;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.container{
+  width:min(650px,100%);
+  text-align:center;
+}
+
+h1{
+  margin:0;
+  font-family:Georgia,serif;
+  font-size:clamp(3rem,8vw,5rem);
+  font-weight:500;
+}
+
+.subtitle{
+  color:var(--muted);
+  margin:12px 0 40px;
+  font-size:1.1rem;
+}
+
+.card{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:28px;
+  box-shadow:0 10px 30px rgba(0,0,0,.04);
+}
+
+label{
+  display:block;
+  text-align:left;
+  margin-bottom:10px;
+  font-weight:600;
+}
+
+input{
+  width:100%;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--paper);
+  font-size:1rem;
+  margin-bottom:16px;
+}
+
+input:focus{
+  outline:none;
+  border-color:var(--accent);
+}
+
+.buttons{
+  display:flex;
+  gap:12px;
+}
+
+button{
+  flex:1;
+  border:none;
+  cursor:pointer;
+  border-radius:14px;
+  padding:15px;
+  font-size:1rem;
+  font-weight:600;
+  transition:.15s;
+}
+
+.play-btn{
+  background:var(--accent);
+  color:white;
+}
+
+.play-btn:hover{
+  transform:translateY(-2px);
+}
+
+.create-btn{
+  background:var(--accent-light);
+  color:var(--accent);
+}
+
+.create-btn:hover{
+  transform:translateY(-2px);
+}
+
+.footer{
+  margin-top:24px;
+  color:var(--muted);
+  font-size:.9rem;
+}
+
+.version{
+  margin-top:10px;
+  color:var(--muted);
+  font-size:.8rem;
+}
+
+@media(max-width:600px){
+  .buttons{
+    flex-direction:column;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>ScreenBreaker</h1>
+
+<p class="subtitle">
+Reaction. Timing. Pain.
+</p>
+
+<div class="card">
+
+<label for="levelCode">
+Level Code
+</label>
+
+<input
+id="levelCode"
+type="text"
+placeholder="Paste a ScreenBreaker code..."
+>
+
+<div class="buttons">
+<button class="play-btn" onclick="playLevel()">
+Play Level
+</button>
+
+<button class="create-btn" onclick="openEditor()">
+Create Level
+</button>
+</div>
+
+</div>
+
+<div class="footer">
+Share levels with codes. No accounts required.
+</div>
+
+<div class="version">
+Version 1.0
+</div>
+
+</div>
+
+<script>
+function playLevel(){
+
+  const code =
+  document.getElementById("levelCode")
+  .value
+  .trim();
+
+  if(!code){
+    alert("Enter a level code.");
+    return;
+  }
+
+  localStorage.setItem(
+    "currentLevelCode",
+    code
+  );
+
+  window.location.href =
+  "play.html";
+}
+
+function openEditor(){
+  window.location.href =
+  "editor.html";
+}
+</script>
+
+</body>
+</html>
