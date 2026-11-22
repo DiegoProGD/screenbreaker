@@ -1,428 +1,153 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<title>
-ScreenBreaker Editor
-</title>
+<title>ScreenBreaker Editor</title>
 
 <style>
 
 :root{
-
 --bg:#f5f3ef;
 --paper:#fffefa;
 --ink:#252525;
 --muted:#77736d;
-
 --accent:#7657a5;
-
---accentLight:#eee8f6;
-
 --line:#e7e1d9;
-
-}
-
-*{
-box-sizing:border-box;
 }
 
 body{
-
 margin:0;
-
-font-family:
-system-ui,
-sans-serif;
-
 background:var(--bg);
-
+font-family:system-ui;
 color:var(--ink);
-
-}
-
-header{
-
-padding:40px 20px;
-
-text-align:center;
-
-}
-
-header h1{
-
-margin:0;
-
-font-size:3rem;
-
-font-family:Georgia,serif;
-
-font-weight:500;
-
-}
-
-header p{
-
-color:var(--muted);
-
 }
 
 main{
-
-width:min(
-1200px,
-calc(100% - 30px)
-);
-
+width:min(900px,calc(100% - 30px));
 margin:auto;
-
-padding-bottom:50px;
-
+padding:20px;
 }
 
 .card{
-
 background:var(--paper);
-
 border:1px solid var(--line);
-
-padding:20px;
-
 border-radius:20px;
-
+padding:20px;
 margin-bottom:20px;
+}
 
+h1{
+font-family:Georgia,serif;
+font-weight:500;
+text-align:center;
 }
 
 .grid{
-
 display:grid;
-
-grid-template-columns:
-repeat(
-auto-fit,
-minmax(
-220px,
-1fr
-)
-);
-
-gap:15px;
-
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:10px;
 }
 
-label{
-
-display:block;
-
-margin-bottom:6px;
-
-font-weight:600;
-
-}
-
-input,
-select,
-textarea{
-
+input,select,textarea{
 width:100%;
-
 padding:12px;
-
 border:1px solid var(--line);
-
 border-radius:12px;
-
-font:inherit;
-
-background:white;
-
+box-sizing:border-box;
 }
 
 button{
-
-cursor:pointer;
-
-border:none;
-
-border-radius:12px;
-
-background:
-var(--accent);
-
-color:white;
-
 padding:12px 16px;
-
-font-size:1rem;
-
+border:none;
+border-radius:12px;
+background:var(--accent);
+color:white;
+cursor:pointer;
 }
 
 button:hover{
-
 opacity:.9;
-
 }
 
-.toolbar{
+#timeDisplay{
+font-size:2rem;
+text-align:center;
+margin-bottom:15px;
+}
 
-display:flex;
-
+#screens{
+display:grid;
 gap:10px;
-
-flex-wrap:wrap;
-
+margin-top:15px;
 }
 
-#timeline{
-
-margin-top:20px;
-
-background:white;
-
-border:
-
-1px solid
-var(--line);
-
+.screen{
+background:#ece7e0;
+height:120px;
 border-radius:16px;
-
-overflow:hidden;
-
-}
-
-.timeline-row{
-
-height:70px;
-
-position:relative;
-
-border-bottom:
-
-1px solid
-var(--line);
-
-cursor:pointer;
-
-}
-
-.timeline-row:last-child{
-
-border-bottom:none;
-
-}
-
-.row-label{
-
-position:absolute;
-
-left:10px;
-
-top:50%;
-
-transform:
-translateY(-50%);
-
-font-weight:700;
-
-z-index:2;
-
-}
-
-.note{
-
-position:absolute;
-
-top:50%;
-
-transform:
-translateY(-50%);
-
-width:18px;
-
-height:18px;
-
-border-radius:50%;
-
-background:
-var(--accent);
-
-cursor:grab;
-
-}
-
-.note.hold{
-
-width:55px;
-
-border-radius:10px;
-
-background:gold;
-
-}
-
-#eventList{
-
-display:grid;
-
-gap:10px;
-
-}
-
-.event-card{
-
-border:
-
-1px solid
-var(--line);
-
-border-radius:12px;
-
-padding:12px;
-
-background:white;
-
-}
-
-.code-box{
-
-min-height:160px;
-
-font-family:monospace;
-
-resize:vertical;
-
-}
-
-.actions{
-
 display:flex;
-
-flex-wrap:wrap;
-
-gap:10px;
-
-margin-top:10px;
-
-}
-
-.preview{
-
-display:grid;
-
-gap:8px;
-
-margin-top:10px;
-
-}
-
-.preview-grid{
-
-display:grid;
-
-gap:5px;
-
-}
-
-.preview-cell{
-
-height:60px;
-
-background:
-var(--accentLight);
-
-border-radius:12px;
-
-display:flex;
-
 justify-content:center;
-
 align-items:center;
-
 font-weight:bold;
+cursor:pointer;
+user-select:none;
+}
 
+.screen:hover{
+background:#ddd6cb;
+}
+
+#events{
+display:grid;
+gap:10px;
+}
+
+.event{
+background:white;
+border:1px solid var(--line);
+border-radius:12px;
+padding:10px;
+}
+
+textarea{
+height:150px;
+font-family:monospace;
 }
 
 </style>
-
 </head>
-
-
-  <body>
-
-<header>
-
-<h1>ScreenBreaker Editor</h1>
-
-<p>
-Create levels and share them using SB1 codes.
-</p>
-
-</header>
+<body>
 
 <main>
 
-<div class="card">
+<h1>ScreenBreaker Editor</h1>
 
-<h2>
-Level Settings
-</h2>
+<div class="card">
 
 <div class="grid">
 
 <div>
-
-<label>
-Level Name
-</label>
-
-<input
-id="levelName"
-value="My Level"
->
-
+<label>Name</label>
+<input id="name" value="My Level">
 </div>
 
 <div>
-
-<label>
-Main Color
-</label>
-
-<input
-id="mainColor"
-value="green"
->
-
+<label>Main Color</label>
+<input id="color" value="green">
 </div>
 
 <div>
-
-<label>
-Sections
-</label>
+<label>Sections</label>
 
 <select id="sections">
 
 <option>1</option>
-
 <option>2</option>
-
 <option>3</option>
-
-<option selected>
-4
-</option>
-
+<option selected>4</option>
 <option>5</option>
-
 <option>6</option>
 
 </select>
@@ -430,129 +155,51 @@ Sections
 </div>
 
 <div>
-
-<label>
-Level Length (Seconds)
-</label>
-
+<label>Reaction Time</label>
 <input
-id="levelLength"
-type="number"
-value="30"
->
-
-</div>
-
-<div>
-
-<label>
-Reaction Window
-</label>
-
-<input
-id="reactionTime"
+id="reaction"
 type="number"
 step="0.1"
 value="1"
 >
+</div>
 
 </div>
 
-<div>
+</div>
 
-<label>
-Practice Start
-</label>
+<div class="card">
+
+<div id="timeDisplay">
+
+0.0s
+
+</div>
 
 <input
-id="practiceStart"
-type="number"
+id="timeline"
+type="range"
+min="0"
+max="60"
 step="0.1"
 value="0"
 >
 
-</div>
-
-<div>
-
-<label>
-Song URL
-</label>
-
-<input
-id="songUrl"
-placeholder="Optional"
->
-
-</div>
-
-<div>
-
-<label>
-Intro Image URL
-</label>
-
-<input
-id="introImage"
-placeholder="Optional"
->
-
-</div>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h2>
-Difficulty Preview
-</h2>
-
-<div id="difficultyPreview">
-
-Medium
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h2>
-Section Layout Preview
-</h2>
-
-<div
-class="preview-grid"
-id="sectionPreview"
-></div>
-
-</div>
-
-<div class="card">
-
-<h2>
-Timeline Tools
-</h2>
-
-<div class="toolbar">
+<br><br>
 
 <select id="noteType">
 
 <option value="N">
-
 Normal
-
 </option>
 
 <option value="H">
-
 Hold
-
 </option>
 
 </select>
+
+<br><br>
 
 <input
 id="holdDuration"
@@ -561,1289 +208,259 @@ step="0.1"
 value="1"
 >
 
-<button
-onclick="undoAction()"
->
-
-Undo
-
-</button>
-
-<button
-onclick="redoAction()"
->
-
-Redo
-
-</button>
-
-<button
-onclick="clearTimeline()"
->
-
-Clear
-
-</button>
-
 </div>
+
+<div class="card">
+
+<h2>Screens</h2>
+
+<div id="screens"></div>
 
 </div>
 
 <div class="card">
 
-<h2>
-Timeline
-</h2>
+<h2>Events</h2>
 
-<p>
-
-Click on a lane to create a note.
-
-</p>
-
-<div id="timeline"></div>
+<div id="events"></div>
 
 </div>
 
 <div class="card">
 
-<h2>
-Events
-</h2>
-
-<div
-id="eventList"
-></div>
-
-</div>
-
-<div class="card">
-
-<h2>
-Generated SB1 Code
-</h2>
+<h2>SB1 Code</h2>
 
 <textarea
-
-id="output"
-
-class="code-box"
-
+id="code"
 readonly
-
 ></textarea>
 
-<div class="actions">
+<br><br>
 
-<button
-onclick="generateCode()"
->
-
+<button onclick="generateCode()">
 Generate Code
-
 </button>
 
-<button
-onclick="copyCode()"
->
-
+<button onclick="copyCode()">
 Copy Code
-
-</button>
-
-<button
-onclick="testLevel()"
->
-
-Test Level
-
-</button>
-
-<button
-onclick="saveProject()"
->
-
-Save Project
-
-</button>
-
-<button
-onclick="triggerLoad()"
->
-
-Load Project
-
 </button>
 
 </div>
-
-</div>
-
-<input
-
-type="file"
-
-accept=".json"
-
-id="fileLoader"
-
-hidden
-
->
 
 </main>
 
 <script>
 
-/* ===========================
-   SCREENBREAKER EDITOR DATA
-=========================== */
+const events=[];
 
-let events = [];
+function buildScreens(){
 
-let undoStack = [];
-
-let redoStack = [];
-
-const timeline =
-document.getElementById(
-"timeline"
-);
-
-const eventList =
-document.getElementById(
-"eventList"
-);
-
-/* ===========================
-   UNDO SYSTEM
-=========================== */
-
-function saveState(){
-
-  undoStack.push(
-    JSON.stringify(events)
-  );
-
-  if(
-    undoStack.length > 100
-  ){
-
-    undoStack.shift();
-
-  }
-
-}
-
-function undoAction(){
-
-  if(
-    undoStack.length === 0
-  ) return;
-
-  redoStack.push(
-    JSON.stringify(events)
-  );
-
-  events = JSON.parse(
-    undoStack.pop()
-  );
-
-  renderEverything();
-
-}
-
-function redoAction(){
-
-  if(
-    redoStack.length === 0
-  ) return;
-
-  undoStack.push(
-    JSON.stringify(events)
-  );
-
-  events = JSON.parse(
-    redoStack.pop()
-  );
-
-  renderEverything();
-
-}
-
-/* ===========================
-   DIFFICULTY SYSTEM
-=========================== */
-
-function calculateDifficulty(){
-
-  const sections =
-  Number(
-  document.getElementById(
-  "sections"
-  ).value
-  );
-
-  const reaction =
-  Number(
-  document.getElementById(
-  "reactionTime"
-  ).value
-  );
-
-  if(
-    sections === 1 &&
-    reaction >= 2
-  ){
-    return "Easy";
-  }
-
-  if(
-    sections <= 3 &&
-    reaction >= 1.5
-  ){
-    return "Still Easy";
-  }
-
-  if(
-    sections === 4 &&
-    reaction >= 0.5
-  ){
-    return "Medium";
-  }
-
-  if(
-    sections === 5 &&
-    reaction >= 0.3
-  ){
-    return "Hard";
-  }
-
-  if(
-    sections === 6 &&
-    reaction >= 0.1
-  ){
-    return "Insane";
-  }
-
-  return "WTF";
-
-}
-
-function updateDifficulty(){
-
-  document
-  .getElementById(
-    "difficultyPreview"
-  )
-  .textContent =
-  calculateDifficulty();
-
-}
-
-/* ===========================
-   SECTION PREVIEW
-=========================== */
-
-function updatePreview(){
-
-  const preview =
-  document.getElementById(
-  "sectionPreview"
-  );
-
-  preview.innerHTML = "";
-
-  const count =
-  Number(
-  document.getElementById(
-  "sections"
-  ).value
-  );
-
-  let cols = 1;
-
-  if(count <= 3)
-    cols = count;
-
-  if(count === 4)
-    cols = 2;
-
-  if(count >= 5)
-    cols = 3;
-
-  preview.style.gridTemplateColumns =
-  `repeat(${cols},1fr)`;
-
-  for(
-    let i=1;
-    i<=count;
-    i++
-  ){
-
-    const div =
-    document.createElement(
-    "div"
-    );
-
-    div.className =
-    "preview-cell";
-
-    div.textContent =
-    i;
-
-    preview.appendChild(
-    div
-    );
-
-  }
-
-}
-
-/* ===========================
-   TIMELINE
-=========================== */
-
-function buildTimeline(){
-
-  timeline.innerHTML = "";
-
-  for(
-    let screen=1;
-    screen<=6;
-    screen++
-  ){
-
-    const row =
-    document.createElement(
-    "div"
-    );
-
-    row.className =
-    "timeline-row";
-
-    row.dataset.screen =
-    screen;
-
-    row.innerHTML =
-    `
-    <div
-    class="row-label">
-
-      Screen ${screen}
-
-    </div>
-    `;
-
-    row.addEventListener(
-    "click",
-
-    event=>{
-
-      const sections =
-      Number(
-      document
-      .getElementById(
-      "sections"
-      )
-      .value
-      );
-
-      if(
-      screen > sections
-      ) return;
-
-      createNote(
-      event,
-      screen
-      );
-
-    });
-
-    timeline.appendChild(
-      row
-    );
-
-  }
-
-  renderNotes();
-
-}
-
-  /* ===========================
-   CREATE NOTES
-=========================== */
-
-function createNote(
-event,
-screen
-){
-
-  saveState();
-
-  redoStack = [];
-
-  const row =
-  event.currentTarget;
-
-  const rect =
-  row.getBoundingClientRect();
-
-  const percent =
-  (
-    event.clientX -
-    rect.left
-  )
-  / rect.width;
-
-  const levelLength =
-  Number(
-  document
-  .getElementById(
-  "levelLength"
-  )
-  .value
-  );
-
-  const time =
-  Number(
-    (
-      percent *
-      levelLength
-    )
-    .toFixed(2)
-  );
-
-  events.push({
-
-    id:
-    Date.now() +
-    Math.random(),
-
-    time,
-
-    screen,
-
-    type:
-    document
-    .getElementById(
-    "noteType"
-    )
-    .value,
-
-    duration:
-    Number(
-    document
-    .getElementById(
-    "holdDuration"
-    )
-    .value
-    )
-
-  });
-
-  events.sort(
-  (a,b)=>
-  a.time-b.time
-  );
-
-  renderEverything();
-
-}
-
-/* ===========================
-   NOTES
-=========================== */
-
-function renderNotes(){
-
-  document
-  .querySelectorAll(
-  ".note"
-  )
-  .forEach(n=>n.remove());
-
-  const length =
-  Number(
-  document
-  .getElementById(
-  "levelLength"
-  )
-  .value
-  );
-
-  events.forEach(
-  event=>{
-
-    const row =
-    document.querySelector(
-    `[data-screen="${event.screen}"]`
-    );
-
-    if(!row) return;
-
-    const note =
-    document.createElement(
-    "div"
-    );
-
-    note.className =
-    "note";
-
-    if(
-    event.type === "H"
-    ){
-
-      note.classList.add(
-      "hold"
-      );
-
-    }
-
-    note.style.left =
-    `
-    ${
-      (
-      event.time /
-      length
-      ) * 100
-    }%
-    `;
-
-    note.title =
-    `${event.time}s`;
-
-    note.dataset.id =
-    event.id;
-
-    enableDragging(
-    note,
-    event
-    );
-
-    note.addEventListener(
-    "dblclick",
-
-    e=>{
-
-      e.stopPropagation();
-
-      deleteEvent(
-      event.id
-      );
-
-    });
-
-    row.appendChild(
-    note
-    );
-
-  });
-
-}
-
-/* ===========================
-   DRAGGING
-=========================== */
-
-function enableDragging(
-note,
-eventData
-){
-
-  let dragging =
-  false;
-
-  note.addEventListener(
-  "mousedown",
-
-  ()=>{
-
-    saveState();
-
-    dragging =
-    true;
-
-  });
-
-  document
-  .addEventListener(
-  "mousemove",
-
-  e=>{
-
-    if(
-    !dragging
-    ) return;
-
-    const row =
-    document.querySelector(
-    `[data-screen=
-    "${eventData.screen}"]`
-    );
-
-    const rect =
-    row
-    .getBoundingClientRect();
-
-    let percent =
-    (
-      e.clientX -
-      rect.left
-    )
-    /
-    rect.width;
-
-    percent =
-    Math.max(
-      0,
-      Math.min(
-      1,
-      percent
-      )
-    );
-
-    const length =
-    Number(
-    document
-    .getElementById(
-    "levelLength"
-    )
-    .value
-    );
-
-    eventData.time =
-    Number(
-      (
-        percent *
-        length
-      )
-      .toFixed(2)
-    );
-
-    renderNotes();
-
-    renderEventList();
-
-  });
-
-  document
-  .addEventListener(
-  "mouseup",
-
-  ()=>{
-
-    dragging =
-    false;
-
-  });
-
-}
-
-/* ===========================
-   DELETE
-=========================== */
-
-function deleteEvent(
-id
-){
-
-  saveState();
-
-  events =
-  events.filter(
-  event=>
-  event.id !== id
-  );
-
-  renderEverything();
-
-}
-
-  /* ===========================
-   EVENT CARDS
-=========================== */
-
-function renderEventList(){
-
-  eventList.innerHTML = "";
-
-  const sorted =
-  [...events].sort(
-  (a,b)=>
-  a.time-b.time
-  );
-
-  sorted.forEach(
-  (event,index)=>{
-
-    const card =
-    document.createElement(
-    "div"
-    );
-
-    card.className =
-    "event-card";
-
-    card.innerHTML =
-    `
-    <strong>
-      #${index + 1}
-    </strong>
-
-    <br><br>
-
-    Time:
-    ${event.time}s
-
-    <br>
-
-    Screen:
-    ${event.screen}
-
-    <br>
-
-    Type:
-    ${
-      event.type === "H"
-      ? "Hold"
-      : "Normal"
-    }
-
-    <br>
-
-    Duration:
-    ${event.duration}s
-
-    <br><br>
-
-    <button
-    onclick="
-    deleteEvent(
-    '${event.id}'
-    )">
-
-    Delete
-
-    </button>
-    `;
-
-    eventList.appendChild(
-    card
-    );
-
-  });
-
-}
-
-/* ===========================
-   CLEAR TIMELINE
-=========================== */
-
-function clearTimeline(){
-
-  if(
-    !confirm(
-      "Clear all events?"
-    )
-  ){
-    return;
-  }
-
-  saveState();
-
-  events = [];
-
-  renderEverything();
-
-}
-
-/* ===========================
-   RENDER EVERYTHING
-=========================== */
-
-function renderEverything(){
-
-  renderNotes();
-
-  renderEventList();
-
-  updateDifficulty();
-
-  updatePreview();
-
-}
-
-/* ===========================
-   SAVE PROJECT
-=========================== */
-
-function saveProject(){
-
-  const project = {
-
-    levelName:
-    document
-    .getElementById(
-    "levelName"
-    )
-    .value,
-
-    mainColor:
-    document
-    .getElementById(
-    "mainColor"
-    )
-    .value,
-
-    sections:
-    document
-    .getElementById(
-    "sections"
-    )
-    .value,
-
-    levelLength:
-    document
-    .getElementById(
-    "levelLength"
-    )
-    .value,
-
-    reactionTime:
-    document
-    .getElementById(
-    "reactionTime"
-    )
-    .value,
-
-    practiceStart:
-    document
-    .getElementById(
-    "practiceStart"
-    )
-    .value,
-
-    songUrl:
-    document
-    .getElementById(
-    "songUrl"
-    )
-    .value,
-
-    introImage:
-    document
-    .getElementById(
-    "introImage"
-    )
-    .value,
-
-    events
-
-  };
-
-  const blob =
-  new Blob(
-
-  [
-    JSON.stringify(
-      project,
-      null,
-      2
-    )
-  ],
-
-  {
-    type:
-    "application/json"
-  }
-
-  );
-
-  const url =
-  URL.createObjectURL(
-  blob
-  );
-
-  const a =
-  document.createElement(
-  "a"
-  );
-
-  a.href = url;
-
-  a.download =
-  (
-  project.levelName ||
-  "project"
-  ) +
-  ".json";
-
-  a.click();
-
-  URL.revokeObjectURL(
-  url
-  );
-
-}
-
-/* ===========================
-   LOAD PROJECT
-=========================== */
-
-function triggerLoad(){
-
-  document
-  .getElementById(
-  "fileLoader"
-  )
-  .click();
-
-}
-
-document
-.getElementById(
-"fileLoader"
-)
-
-.addEventListener(
-
-"change",
-
-event=>{
-
-const file =
-event.target.files[0];
-
-if(
-!file
-) return;
-
-const reader =
-new FileReader();
-
-reader.onload =
-function(){
-
-const data =
-JSON.parse(
-reader.result
-);
-
-document
-.getElementById(
-"levelName"
-)
-.value =
-data.levelName ||
-"";
-
-document
-.getElementById(
-"mainColor"
-)
-.value =
-data.mainColor ||
-"";
-
+const count=
+Number(
 document
 .getElementById(
 "sections"
 )
-.value =
-data.sections ||
-4;
+.value
+);
 
+const screens=
 document
 .getElementById(
-"levelLength"
-)
-.value =
-data.levelLength ||
-30;
+"screens"
+);
 
-document
-.getElementById(
-"reactionTime"
-)
-.value =
-data.reactionTime ||
-1;
+screens.innerHTML="";
 
-document
-.getElementById(
-"practiceStart"
-)
-.value =
-data.practiceStart ||
-0;
+let cols=2;
 
-document
-.getElementById(
-"songUrl"
-)
-.value =
-data.songUrl ||
-"";
+if(count<=3)
+cols=count;
 
-document
-.getElementById(
-"introImage"
-)
-.value =
-data.introImage ||
-"";
+if(count>=5)
+cols=3;
 
-events =
-data.events ||
-[];
+screens.style.gridTemplateColumns=
+`repeat(${cols},1fr)`;
 
-renderEverything();
+for(
+let i=1;
+i<=count;
+i++
+){
 
-};
+const div=
+document.createElement(
+"div"
+);
 
-reader.readAsText(
-file
+div.className=
+"screen";
+
+div.textContent=
+"Screen "+i;
+
+div.onclick=
+()=>addEvent(i);
+
+screens.appendChild(
+div
 );
 
 }
 
+}
+
+function addEvent(screen){
+
+events.push({
+
+time:Number(
+document
+.getElementById(
+"timeline"
+)
+.value
+),
+
+screen,
+
+type:
+document
+.getElementById(
+"noteType"
+)
+.value,
+
+duration:Number(
+document
+.getElementById(
+"holdDuration"
+)
+.value
+)
+
+});
+
+renderEvents();
+
+}
+
+function renderEvents(){
+
+const container=
+document.getElementById(
+"events"
 );
 
-  /* ===========================
-   SB1 CODE GENERATION
-=========================== */
+container.innerHTML="";
+
+events.sort(
+(a,b)=>a.time-b.time
+);
+
+events.forEach(
+(event,index)=>{
+
+const div=
+document.createElement(
+"div"
+);
+
+div.className=
+"event";
+
+div.innerHTML=`
+${event.time}s
+•
+Screen ${event.screen}
+•
+${event.type==="H"?"Hold":"Normal"}
+
+<button
+style="float:right"
+onclick="
+removeEvent(
+${index}
+)
+">
+Delete
+</button>
+`;
+
+container.appendChild(
+div
+);
+
+});
+
+}
+
+function removeEvent(i){
+
+events.splice(i,1);
+
+renderEvents();
+
+}
 
 function generateCode(){
 
-  const levelName =
-  document
-  .getElementById(
-  "levelName"
-  )
-  .value;
+const code=
 
-  const mainColor =
-  document
-  .getElementById(
-  "mainColor"
-  )
-  .value;
+`SB1|${name.value}|${color.value}|${sections.value}|${reaction.value}|`
 
-  const sections =
-  document
-  .getElementById(
-  "sections"
-  )
-  .value;
++
 
-  const levelLength =
-  document
-  .getElementById(
-  "levelLength"
-  )
-  .value;
+events.map(
 
-  const reactionTime =
-  document
-  .getElementById(
-  "reactionTime"
-  )
-  .value;
+e=>
 
-  const practiceStart =
-  document
-  .getElementById(
-  "practiceStart"
-  )
-  .value;
+`${e.time},${e.screen},${e.type},${e.duration}`
 
-  const songUrl =
-  document
-  .getElementById(
-  "songUrl"
-  )
-  .value || "none";
+).join(";");
 
-  const introImage =
-  document
-  .getElementById(
-  "introImage"
-  )
-  .value || "none";
-
-  const difficulty =
-  calculateDifficulty();
-
-  const sorted =
-  [...events].sort(
-  (a,b)=>
-  a.time-b.time
-  );
-
-  const eventString =
-  sorted.map(event=>
-
-    `${event.time},${event.screen},${event.type},${event.duration}`
-
-  ).join(";");
-
-  const code =
-
-  `SB1|`+
-
-  `${levelName}|`+
-
-  `${mainColor}|`+
-
-  `${sections}|`+
-
-  `${levelLength}|`+
-
-  `${reactionTime}|`+
-
-  `${practiceStart}|`+
-
-  `${difficulty}|`+
-
-  `${songUrl}|`+
-
-  `${introImage}|`+
-
-  `${eventString}`;
-
-  document
-  .getElementById(
-  "output"
-  )
-  .value =
-  code;
+document
+.getElementById(
+"code"
+)
+.value=
+code;
 
 }
-
-/* ===========================
-   COPY
-=========================== */
 
 function copyCode(){
 
-  const box =
-  document
-  .getElementById(
-  "output"
-  );
-
-  box.select();
-
-  navigator.clipboard
-  .writeText(
-  box.value
-  );
-
-  alert(
-  "SB1 code copied!"
-  );
-
-}
-
-/* ===========================
-   TEST LEVEL
-=========================== */
-
-function testLevel(){
-
-  generateCode();
-
-  localStorage.setItem(
-
-  "currentLevelCode",
-
-  document
-  .getElementById(
-  "output"
-  )
-  .value
-
-  );
-
-  window.open(
-
-  "play.html",
-
-  "_blank"
-
-  );
-
-}
-
-/* ===========================
-   LIVE UPDATES
-=========================== */
-
-document
-.getElementById(
-"sections"
-)
-
-.addEventListener(
-
-"change",
-
-()=>{
-
-buildTimeline();
-
-updatePreview();
-
-updateDifficulty();
-
-}
-
-);
-
-document
-.getElementById(
-"reactionTime"
-)
-
-.addEventListener(
-
-"input",
-
-updateDifficulty
-
-);
-
-document
-.getElementById(
-"levelLength"
-)
-
-.addEventListener(
-
-"input",
-
-()=>{
-
-renderNotes();
-
-}
-
-);
-
-/* ===========================
-   STARTUP
-=========================== */
-
-buildTimeline();
-
-updatePreview();
-
-updateDifficulty();
-
-renderEventList();
-
 generateCode();
+
+navigator.clipboard.writeText(
+document
+.getElementById(
+"code"
+)
+.value
+);
+
+alert(
+"SB1 code copied!"
+);
+
+}
+
+timeline.addEventListener(
+"input",
+()=>{
+timeDisplay.textContent=
+timeline.value+"s";
+}
+);
+
+sections.addEventListener(
+"change",
+buildScreens
+);
+
+buildScreens();
 
 </script>
 
