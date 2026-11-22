@@ -550,7 +550,14 @@ function hit(screen){
 
 if(dead) return;
 
-if(!waiting) return;
+if(!waiting){
+
+    die();
+
+    return;
+
+}
+
 
 if(
 
