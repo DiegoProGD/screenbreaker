@@ -6,25 +6,18 @@
 
 <meta
 name="viewport"
-content="
-width=device-width,
-initial-scale=1
-">
+content="width=device-width,initial-scale=1">
 
-<title>
-ScreenBreaker
-</title>
+<title>ScreenBreaker</title>
 
 <style>
 
 :root{
-
 --bg:#f5f3ef;
 --paper:#fffefa;
 --ink:#252525;
 --line:#e7e1d9;
 --accent:#7657a5;
-
 }
 
 *{
@@ -35,37 +28,31 @@ body{
 
 margin:0;
 
-background:
-var(--bg);
+background:var(--bg);
 
-font-family:
-system-ui,
-sans-serif;
+font-family:system-ui,sans-serif;
 
-color:
-var(--ink);
+color:#222;
+
+transition:.2s;
 
 }
 
 .topbar{
 
-background:
-white;
-
 padding:15px;
 
-border-bottom:
-1px solid
-var(--line);
+background:white;
 
 display:flex;
 
+justify-content:space-between;
+
 flex-wrap:wrap;
 
-gap:15px;
+gap:10px;
 
-justify-content:
-space-between;
+border-bottom:1px solid var(--line);
 
 }
 
@@ -75,33 +62,33 @@ text-align:center;
 
 font-size:2rem;
 
-padding:20px;
-
 font-weight:bold;
+
+padding:20px;
 
 }
 
 #screens{
 
+width:min(1000px,95%);
+
+margin:auto;
+
 display:grid;
 
-gap:10px;
+gap:20px;
 
-width:min(
-900px,
-95%
-);
-
-margin:
-20px auto;
+padding:20px;
 
 }
 
 .screen{
 
-height:200px;
+height:220px;
 
 background:#ddd;
+
+border-radius:30px;
 
 display:flex;
 
@@ -109,36 +96,17 @@ align-items:center;
 
 justify-content:center;
 
-border-radius:18px;
-
-position:relative;
-
-font-size:1.5rem;
+font-size:3rem;
 
 font-weight:bold;
 
+position:relative;
+
 user-select:none;
 
-}
+cursor:pointer;
 
-.active{
-
-outline:
-6px solid lime;
-
-}
-
-.waiting{
-
-background:
-lightgreen;
-
-}
-
-.hold{
-
-outline:
-6px solid gold;
+transition:.2s;
 
 }
 
@@ -146,15 +114,15 @@ outline:
 
 position:absolute;
 
-top:10px;
+top:15px;
 
-left:10px;
+left:15px;
 
-width:20px;
+width:24px;
 
-height:20px;
+height:24px;
 
-border-radius:4px;
+border-radius:6px;
 
 }
 
@@ -162,14 +130,25 @@ border-radius:4px;
 
 background:white;
 
-border:
-1px solid #999;
+border:1px solid #888;
 
 }
 
 .holdIndicator{
 
 background:gold;
+
+}
+
+.waiting{
+
+outline:8px solid white;
+
+}
+
+.hold{
+
+outline:8px solid gold;
 
 }
 
@@ -186,15 +165,11 @@ Loading...
 </div>
 
 <div id="attempts">
-
 Attempts: 1
-
 </div>
 
 <div id="totalAttempts">
-
 Total: 0
-
 </div>
 
 </div>
@@ -220,6 +195,39 @@ k:6
 
 };
 
+function getColor(color){
+
+const colors={
+
+red:"#ff4d4d",
+blue:"#4d7dff",
+green:"#47d147",
+purple:"#a855f7",
+pink:"#ff5ca8",
+orange:"#ff9d42",
+yellow:"#ffe14d",
+cyan:"#36d4ff",
+lime:"#99ff66",
+gold:"#ffd700",
+silver:"#c0c0c0",
+navy:"#001f8f",
+teal:"#008080",
+maroon:"#800000",
+olive:"#808000",
+white:"#ffffff",
+black:"#222222",
+gray:"#888888",
+grey:"#888888"
+
+};
+
+return colors[
+String(color)
+.toLowerCase()
+] || color;
+
+}
+
 const code =
 
 localStorage.getItem(
@@ -228,102 +236,97 @@ localStorage.getItem(
 
 if(!code){
 
-document.body.innerHTML =
+document.body.innerHTML=
 
-"<h1>No level loaded</h1>";
+"<h1>No level loaded.</h1>";
 
 throw Error();
 
 }
 
-let level = {};
+let level={};
 
-let events = [];
+let events=[];
 
-let currentEvent = 0;
+let currentEvent=0;
 
-let startTime = 0;
+let waiting=null;
 
-let waiting = null;
+let dead=false;
 
-let dead = false;
+let startTime=0;
 
-let attempt = 1;
+let attempt=1;
+
+let themeColor="#7657a5";
 
 parseLevel();
 
 function parseLevel(){
 
-const parts =
+const parts=
 code.split("|");
 
-level = {
+level={
 
-name:
-parts[1],
+name:parts[1],
 
-color:
-parts[2],
+color:parts[2],
 
-sections:
-Number(
-parts[3]
-),
+sections:Number(parts[3]),
 
-length:
-Number(
-parts[4]
-),
+length:Number(parts[4]),
 
-reaction:
-Number(
-parts[5]
-),
+reaction:Number(parts[5]),
 
-practice:
-Number(
-parts[6]
-)
+practice:Number(parts[6])
 
 };
 
-document
-.getElementById(
+themeColor=
+getColor(
+level.color
+);
+
+document.body.style.background=
+themeColor;
+
+document.querySelector(
+".topbar"
+).style.background=
+themeColor;
+
+document.querySelector(
+".topbar"
+).style.color=
+"white";
+
+document.getElementById(
 "levelName"
-)
-.textContent =
+).textContent=
 level.name;
 
-const remaining =
+const remaining=
 parts.slice(7)
 .join("|");
 
-if(
-remaining.trim()
-){
+if(remaining.trim()){
 
-events =
+events=
 remaining
 .split(";")
 .filter(Boolean)
 .map(raw=>{
 
-const p =
+const p=
 raw.split(",");
 
 return{
 
-time:
-Number(p[0]),
-
-screen:
-Number(p[1]),
-
-type:
-p[2],
-
-duration:
-Number(p[3])
+time:Number(p[0]),
+screen:Number(p[1]),
+type:p[2],
+duration:Number(p[3])
 
 };
 
@@ -336,43 +339,33 @@ buildGrid();
 loadAttempts();
 
 setTimeout(
-
 startLevel,
-
 1000
-
 );
 
 }
 
 function buildGrid(){
 
-const container =
+const container=
 document.getElementById(
 "screens"
 );
 
-container.innerHTML="";
+let cols=2;
 
-let cols = 2;
-
-if(
-level.sections <= 3
-){
-cols =
-level.sections;
+if(level.sections<=3){
+cols=level.sections;
 }
 
-if(
-level.sections >= 5
-){
-cols = 3;
+if(level.sections>=5){
+cols=3;
 }
 
-container.style
-.gridTemplateColumns =
-
+container.style.gridTemplateColumns=
 `repeat(${cols},1fr)`;
+
+container.innerHTML="";
 
 for(
 let i=1;
@@ -380,19 +373,18 @@ i<=level.sections;
 i++
 ){
 
-const div =
-document
-.createElement(
+const div=
+document.createElement(
 "div"
 );
 
-div.className =
+div.className=
 "screen";
 
-div.dataset.screen =
+div.dataset.screen=
 i;
 
-div.innerHTML =
+div.innerHTML=
 
 `
 ${i}
@@ -405,16 +397,12 @@ normalIndicator
 </div>
 `;
 
-div.addEventListener(
+div.onclick=
+()=>hit(i);
 
-"click",
-
-()=>hit(i)
-
+container.appendChild(
+div
 );
-
-container
-.appendChild(div);
 
 }
 
@@ -460,7 +448,7 @@ const elapsed =
 performance.now()
 -
 startTime
-) / 1000;
+)/1000;
 
 while(
 
@@ -475,9 +463,7 @@ events[currentEvent].time
 ){
 
 activateEvent(
-
 events[currentEvent]
-
 );
 
 currentEvent++;
@@ -506,12 +492,17 @@ tile.classList.add(
 "waiting"
 );
 
+tile.style.background =
+themeColor;
+
 const corner =
+
 tile.querySelector(
 ".corner"
 );
 
 corner.className =
+
 "corner " +
 
 (
@@ -538,8 +529,11 @@ corner
 setTimeout(()=>{
 
 if(
+
 waiting &&
+
 waiting.event === event
+
 ){
 
 die();
@@ -559,11 +553,17 @@ if(dead) return;
 if(!waiting) return;
 
 if(
+
 waiting.event.screen
-!== screen
+
+!==
+
+screen
+
 ){
 
 die();
+
 return;
 
 }
@@ -571,6 +571,7 @@ return;
 if(
 
 waiting.event.type
+
 === "N"
 
 ){
@@ -640,7 +641,8 @@ release
 
 function clearCurrent(){
 
-if(!waiting) return;
+if(!waiting)
+return;
 
 waiting.tile.classList.remove(
 "waiting"
@@ -649,6 +651,9 @@ waiting.tile.classList.remove(
 waiting.tile.classList.remove(
 "hold"
 );
+
+waiting.tile.style.background =
+"#ddd";
 
 waiting = null;
 
@@ -667,11 +672,9 @@ events.length
 
 ){
 
-document
-.getElementById(
+document.getElementById(
 "message"
-)
-.textContent =
+).textContent =
 
 "LEVEL COMPLETE";
 
@@ -683,17 +686,16 @@ dead = true;
 
 function die(){
 
-if(dead) return;
+if(dead)
+return;
 
 dead = true;
 
 increaseAttempts();
 
-document
-.getElementById(
+document.getElementById(
 "message"
-)
-.textContent =
+).textContent =
 
 "YOU DIED";
 
@@ -714,15 +716,18 @@ document
 ".screen"
 )
 
-.forEach(screen=>{
+.forEach(tile=>{
 
-screen.classList.remove(
+tile.classList.remove(
 "waiting"
 );
 
-screen.classList.remove(
+tile.classList.remove(
 "hold"
 );
+
+tile.style.background =
+"#ddd";
 
 });
 
@@ -730,8 +735,7 @@ startLevel();
 
 }
 
-document
-.addEventListener(
+document.addEventListener(
 
 "keydown",
 
@@ -740,8 +744,7 @@ event=>{
 const screen =
 
 keyMap[
-event.key
-.toLowerCase()
+event.key.toLowerCase()
 ];
 
 if(screen){
@@ -775,20 +778,16 @@ key
 
 );
 
-document
-.getElementById(
+document.getElementById(
 "totalAttempts"
-)
-.textContent =
+).textContent =
 
 "Total: " +
 total;
 
-document
-.getElementById(
+document.getElementById(
 "attempts"
-)
-.textContent =
+).textContent =
 
 "Attempts: " +
 attempt;
@@ -825,20 +824,16 @@ key,
 total
 );
 
-document
-.getElementById(
+document.getElementById(
 "attempts"
-)
-.textContent =
+).textContent =
 
 "Attempts: " +
 attempt;
 
-document
-.getElementById(
+document.getElementById(
 "totalAttempts"
-)
-.textContent =
+).textContent =
 
 "Total: " +
 total;
