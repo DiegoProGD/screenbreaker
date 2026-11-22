@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="
+width=device-width,
+initial-scale=1
+">
+
+<title>
+ScreenBreaker
+</title>
+
+<style>
+
+:root{
+
+--bg:#f5f3ef;
+--paper:#fffefa;
+--ink:#252525;
+--line:#e7e1d9;
+--accent:#7657a5;
+
+}
+
+*{
+box-sizing:border-box;
+}
+
+body{
+
+margin:0;
+
+background:
+var(--bg);
+
+font-family:
+system-ui,
+sans-serif;
+
+color:
+var(--ink);
+
+}
+
+.topbar{
+
+background:
+white;
+
+padding:15px;
+
+border-bottom:
+1px solid
+var(--line);
+
+display:flex;
+
+flex-wrap:wrap;
+
+gap:15px;
+
+justify-content:
+space-between;
+
+}
+
+#message{
+
+text-align:center;
+
+font-size:2rem;
+
+padding:20px;
+
+font-weight:bold;
+
+}
+
+#screens{
+
+display:grid;
+
+gap:10px;
+
+width:min(
+900px,
+95%
+);
+
+margin:
+20px auto;
+
+}
+
+.screen{
+
+height:200px;
+
+background:#ddd;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+border-radius:18px;
+
+position:relative;
+
+font-size:1.5rem;
+
+font-weight:bold;
+
+user-select:none;
+
+}
+
+.active{
+
+outline:
+6px solid lime;
+
+}
+
+.waiting{
+
+background:
+lightgreen;
+
+}
+
+.hold{
+
+outline:
+6px solid gold;
+
+}
+
+.corner{
+
+position:absolute;
+
+top:10px;
+
+left:10px;
+
+width:20px;
+
+height:20px;
+
+border-radius:4px;
+
+}
+
+.normalIndicator{
+
+background:white;
+
+border:
+1px solid #999;
+
+}
+
+.holdIndicator{
+
+background:gold;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="topbar">
+
+<div id="levelName">
+Loading...
+</div>
+
+<div id="attempts">
+
+Attempts: 1
+
+</div>
+
+<div id="totalAttempts">
+
+Total: 0
+
+</div>
+
+</div>
+
+<div id="message">
+
+Get Ready...
+
+</div>
+
+<div id="screens"></div>
+
+<script>
+
+const keyMap = {
+
+d:1,
+f:2,
+g:3,
+h:4,
+j:5,
+k:6
+
+};
+
+const code =
+
+localStorage.getItem(
+"currentLevelCode"
+);
+
+if(!code){
+
+document.body.innerHTML =
+
+"<h1>No level loaded</h1>";
+
+throw Error();
+
+}
+
+let level = {};
+
+let events = [];
+
+let currentEvent = 0;
+
+let startTime = 0;
+
+let waiting = null;
+
+let dead = false;
+
+let attempt = 1;
+
+parseLevel();
+
+function parseLevel(){
+
+const parts =
+code.split("|");
+
+level = {
+
+name:
+parts[1],
+
+color:
+parts[2],
+
+sections:
+Number(
+parts[3]
+),
+
+length:
+Number(
+parts[4]
+),
+
+reaction:
+Number(
+parts[5]
+),
+
+practice:
+Number(
+parts[6]
+)
+
+};
+
+document
+.getElementById(
+"levelName"
+)
+.textContent =
+level.name;
+
+const remaining =
+parts.slice(7)
+.join("|");
+
+if(
+remaining.trim()
+){
+
+events =
+remaining
+.split(";")
+.filter(Boolean)
+.map(raw=>{
+
+const p =
+raw.split(",");
+
+return{
+
+time:
+Number(p[0]),
+
+screen:
+Number(p[1]),
+
+type:
+p[2],
+
+duration:
+Number(p[3])
+
+};
+
+});
+
+}
+
+buildGrid();
+
+loadAttempts();
+
+setTimeout(
+
+startLevel,
+
+1000
+
+);
+
+}
+
+function buildGrid(){
+
+const container =
+document.getElementById(
+"screens"
+);
+
+container.innerHTML="";
+
+let cols = 2;
+
+if(
+level.sections <= 3
+){
+cols =
+level.sections;
+}
+
+if(
+level.sections >= 5
+){
+cols = 3;
+}
+
+container.style
+.gridTemplateColumns =
+
+`repeat(${cols},1fr)`;
+
+for(
+let i=1;
+i<=level.sections;
+i++
+){
+
+const div =
+document
+.createElement(
+"div"
+);
+
+div.className =
+"screen";
+
+div.dataset.screen =
+i;
+
+div.innerHTML =
+
+`
+Screen ${i}
+
+<div
+class="
+corner
+normalIndicator
+">
+</div>
+`;
+
+div.addEventListener(
+
+"click",
+
+()=>hit(i)
+
+);
+
+container
+.appendChild(div);
+
+}
+
+}
+
+  function startLevel(){
+
+document.getElementById(
+"message"
+).textContent = "";
+
+currentEvent = 0;
+
+waiting = null;
+
+dead = false;
+
+startTime =
+
+performance.now()
+
+-
+
+(
+level.practice
+*
+1000
+);
+
+requestAnimationFrame(
+gameLoop
+);
+
+}
+
+function gameLoop(){
+
+if(dead) return;
+
+const elapsed =
+
+(
+performance.now()
+-
+startTime
+) / 1000;
+
+while(
+
+currentEvent <
+events.length
+
+&&
+
+elapsed >=
+events[currentEvent].time
+
+){
+
+activateEvent(
+
+events[currentEvent]
+
+);
+
+currentEvent++;
+
+}
+
+requestAnimationFrame(
+gameLoop
+);
+
+}
+
+function activateEvent(event){
+
+const tile =
+
+document.querySelector(
+
+`[data-screen="${event.screen}"]`
+
+);
+
+if(!tile) return;
+
+tile.classList.add(
+"waiting"
+);
+
+const corner =
+tile.querySelector(
+".corner"
+);
+
+corner.className =
+"corner " +
+
+(
+event.type==="H"
+
+?
+
+"holdIndicator"
+
+:
+
+"normalIndicator"
+
+);
+
+waiting = {
+
+event,
+tile,
+corner
+
+};
+
+setTimeout(()=>{
+
+if(
+waiting &&
+waiting.event === event
+){
+
+die();
+
+}
+
+},
+level.reaction * 1000
+);
+
+}
+
+function hit(screen){
+
+if(dead) return;
+
+if(!waiting) return;
+
+if(
+waiting.event.screen
+!== screen
+){
+
+die();
+return;
+
+}
+
+if(
+
+waiting.event.type
+=== "N"
+
+){
+
+clearCurrent();
+
+checkComplete();
+
+return;
+
+}
+
+startHold();
+
+}
+
+function startHold(){
+
+const event =
+waiting.event;
+
+waiting.tile.classList.add(
+"hold"
+);
+
+const started =
+performance.now();
+
+function release(){
+
+document.removeEventListener(
+"mouseup",
+release
+);
+
+const held =
+
+(
+performance.now()
+-
+started
+)/1000;
+
+if(
+held <
+event.duration
+){
+
+die();
+
+return;
+
+}
+
+clearCurrent();
+
+checkComplete();
+
+}
+
+document.addEventListener(
+"mouseup",
+release
+);
+
+}
+
+function clearCurrent(){
+
+if(!waiting) return;
+
+waiting.tile.classList.remove(
+"waiting"
+);
+
+waiting.tile.classList.remove(
+"hold"
+);
+
+waiting = null;
+
+}
+
+function checkComplete(){
+
+if(
+
+currentEvent >=
+events.length
+
+&&
+
+!waiting
+
+){
+
+document
+.getElementById(
+"message"
+)
+.textContent =
+
+"LEVEL COMPLETE";
+
+dead = true;
+
+}
+
+}
+
+function die(){
+
+if(dead) return;
+
+dead = true;
+
+increaseAttempts();
+
+document
+.getElementById(
+"message"
+)
+.textContent =
+
+"YOU DIED";
+
+setTimeout(
+
+restartLevel,
+
+1000
+
+);
+
+}
+
+function restartLevel(){
+
+document
+.querySelectorAll(
+".screen"
+)
+
+.forEach(screen=>{
+
+screen.classList.remove(
+"waiting"
+);
+
+screen.classList.remove(
+"hold"
+);
+
+});
+
+startLevel();
+
+}
+
+document
+.addEventListener(
+
+"keydown",
+
+event=>{
+
+const screen =
+
+keyMap[
+event.key
+.toLowerCase()
+];
+
+if(screen){
+
+hit(screen);
+
+}
+
+}
+
+);
+
+function loadAttempts(){
+
+const key =
+
+"sb_attempts_" +
+code;
+
+const total =
+
+Number(
+
+localStorage.getItem(
+key
+)
+
+||
+
+0
+
+);
+
+document
+.getElementById(
+"totalAttempts"
+)
+.textContent =
+
+"Total: " +
+total;
+
+document
+.getElementById(
+"attempts"
+)
+.textContent =
+
+"Attempts: " +
+attempt;
+
+}
+
+function increaseAttempts(){
+
+attempt++;
+
+const key =
+
+"sb_attempts_" +
+code;
+
+let total =
+
+Number(
+
+localStorage.getItem(
+key
+)
+
+||
+
+0
+
+);
+
+total++;
+
+localStorage.setItem(
+key,
+total
+);
+
+document
+.getElementById(
+"attempts"
+)
+.textContent =
+
+"Attempts: " +
+attempt;
+
+document
+.getElementById(
+"totalAttempts"
+)
+.textContent =
+
+"Total: " +
+total;
+
+}
+
+</script>
+
+</body>
+</html>
