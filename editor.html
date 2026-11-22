@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>ScreenBreaker Editor</title>
 
@@ -11,7 +11,6 @@
 --bg:#f5f3ef;
 --paper:#fffefa;
 --ink:#252525;
---muted:#77736d;
 --accent:#7657a5;
 --line:#e7e1d9;
 }
@@ -34,9 +33,9 @@ padding:20px;
 }
 
 h1{
+text-align:center;
 font-family:Georgia,serif;
 font-weight:500;
-text-align:center;
 }
 
 .card{
@@ -58,8 +57,8 @@ select,
 textarea{
 width:100%;
 padding:12px;
-border:1px solid var(--line);
 border-radius:12px;
+border:1px solid var(--line);
 font:inherit;
 }
 
@@ -70,16 +69,6 @@ border-radius:12px;
 background:var(--accent);
 color:white;
 cursor:pointer;
-}
-
-button:hover{
-opacity:.9;
-}
-
-#timeDisplay{
-font-size:2rem;
-text-align:center;
-margin-bottom:10px;
 }
 
 #screens{
@@ -97,8 +86,6 @@ justify-content:center;
 align-items:center;
 font-weight:bold;
 cursor:pointer;
-user-select:none;
-transition:.15s;
 }
 
 .screen:hover{
@@ -115,6 +102,12 @@ background:white;
 border:1px solid var(--line);
 border-radius:12px;
 padding:10px;
+}
+
+#timeDisplay{
+font-size:2rem;
+text-align:center;
+margin-bottom:10px;
 }
 
 textarea{
@@ -143,30 +136,32 @@ margin-top:10px;
 
 <div>
 <label>Level Name</label>
-<input id="name" value="My Level">
+<input id="levelName" value="My Level">
 </div>
 
 <div>
 <label>Main Color</label>
-<input id="color" value="green">
+<input id="mainColor" value="Green">
 </div>
 
 <div>
 <label>Sections</label>
 
 <select id="sections">
+
 <option>1</option>
 <option>2</option>
 <option>3</option>
 <option selected>4</option>
 <option>5</option>
 <option>6</option>
+
 </select>
 
 </div>
 
 <div>
-<label>Level Length (seconds)</label>
+<label>Level Length (Seconds)</label>
 <input
 id="levelLength"
 type="number"
@@ -177,7 +172,7 @@ min="1">
 <div>
 <label>Reaction Time</label>
 <input
-id="reaction"
+id="reactionTime"
 type="number"
 step="0.1"
 value="1">
@@ -188,8 +183,8 @@ value="1">
 <input
 id="practiceStart"
 type="number"
-step="0.1"
-value="0">
+value="0"
+step="0.1">
 </div>
 
 </div>
@@ -229,8 +224,8 @@ Hold
 <input
 id="holdDuration"
 type="number"
-step="0.1"
 value="1"
+step="0.1"
 placeholder="Hold Duration">
 
 </div>
@@ -278,7 +273,7 @@ type="file"
 id="loader"
 hidden>
 
-<button onclick="loader.click()">
+<button onclick="document.getElementById('loader').click()">
 Load Project
 </button>
 
@@ -290,22 +285,84 @@ Load Project
 
 const events = [];
 
+const levelNameInput =
+document.getElementById(
+"levelName"
+);
+
+const mainColorInput =
+document.getElementById(
+"mainColor"
+);
+
+const sectionsInput =
+document.getElementById(
+"sections"
+);
+
+const levelLengthInput =
+document.getElementById(
+"levelLength"
+);
+
+const reactionInput =
+document.getElementById(
+"reactionTime"
+);
+
+const practiceInput =
+document.getElementById(
+"practiceStart"
+);
+
+const timeline =
+document.getElementById(
+"timeline"
+);
+
+const timeDisplay =
+document.getElementById(
+"timeDisplay"
+);
+
+const eventsContainer =
+document.getElementById(
+"events"
+);
+
+const codeBox =
+document.getElementById(
+"code"
+);
+
+const loader =
+document.getElementById(
+"loader"
+);
+
 function buildScreens(){
 
 const count =
-Number(sections.value);
+Number(
+sectionsInput.value
+);
 
 const screens =
 document.getElementById(
 "screens"
 );
 
-screens.innerHTML="";
+screens.innerHTML = "";
 
 let cols = 2;
 
-if(count<=3) cols=count;
-if(count>=5) cols=3;
+if(count <= 3){
+cols = count;
+}
+
+if(count >= 5){
+cols = 3;
+}
 
 screens.style.gridTemplateColumns =
 `repeat(${cols},1fr)`;
@@ -330,7 +387,9 @@ div.textContent =
 div.onclick =
 ()=> addEvent(i);
 
-screens.appendChild(div);
+screens.appendChild(
+div
+);
 
 }
 
@@ -344,7 +403,7 @@ time:Number(
 timeline.value
 ),
 
-screen,
+screen:screen,
 
 type:
 document
@@ -370,17 +429,12 @@ renderEvents();
 
 function renderEvents(){
 
-const container =
-document.getElementById(
-"events"
-);
-
-container.innerHTML="";
-
 events.sort(
 (a,b)=>
 a.time-b.time
 );
+
+eventsContainer.innerHTML="";
 
 events.forEach(
 (event,index)=>{
@@ -390,10 +444,10 @@ document.createElement(
 "div"
 );
 
-div.className =
+div.className=
 "event";
 
-div.innerHTML =
+div.innerHTML=
 
 `
 <strong>
@@ -405,7 +459,7 @@ Screen ${event.screen}
 
 •
 ${
-event.type === "H"
+event.type==="H"
 ?
 `Hold (${event.duration}s)`
 :
@@ -424,10 +478,9 @@ removeEvent(${index})
 Delete
 
 </button>
-
 `;
 
-container.appendChild(
+eventsContainer.appendChild(
 div
 );
 
@@ -435,9 +488,12 @@ div
 
 }
 
-function removeEvent(i){
+function removeEvent(index){
 
-events.splice(i,1);
+events.splice(
+index,
+1
+);
 
 renderEvents();
 
@@ -445,35 +501,7 @@ renderEvents();
 
 function generateCode(){
 
-const code =
-
-`SB1|`
-
-+
-
-`${name.value}|`
-
-+
-
-`${color.value}|`
-
-+
-
-`${sections.value}|`
-
-+
-
-`${levelLength.value}|`
-
-+
-
-`${reaction.value}|`
-
-+
-
-`${practiceStart.value}|`
-
-+
+const eventString =
 
 events.map(
 
@@ -483,11 +511,39 @@ e=>
 
 ).join(";");
 
-document
-.getElementById(
-"code"
-)
-.value =
+const code =
+
+`SB1|`
+
++
+
+`${levelNameInput.value}|`
+
++
+
+`${mainColorInput.value}|`
+
++
+
+`${sectionsInput.value}|`
+
++
+
+`${levelLengthInput.value}|`
+
++
+
+`${reactionInput.value}|`
+
++
+
+`${practiceInput.value}|`
+
++
+
+eventString;
+
+codeBox.value =
 code;
 
 }
@@ -496,15 +552,10 @@ function copyCode(){
 
 generateCode();
 
-navigator.clipboard
+navigator
+.clipboard
 .writeText(
-
-document
-.getElementById(
-"code"
-)
-.value
-
+codeBox.value
 );
 
 alert(
@@ -515,25 +566,25 @@ alert(
 
 function saveProject(){
 
-const data = {
+const project = {
 
-name:
-name.value,
+levelName:
+levelNameInput.value,
 
-color:
-color.value,
+mainColor:
+mainColorInput.value,
 
 sections:
-sections.value,
+sectionsInput.value,
 
 levelLength:
-levelLength.value,
+levelLengthInput.value,
 
-reaction:
-reaction.value,
+reactionTime:
+reactionInput.value,
 
 practiceStart:
-practiceStart.value,
+practiceInput.value,
 
 events
 
@@ -544,7 +595,7 @@ new Blob(
 
 [
 JSON.stringify(
-data,
+project,
 null,
 2
 )
@@ -557,20 +608,27 @@ type:
 
 );
 
-const a =
-document.createElement(
+const link =
+document
+.createElement(
 "a"
 );
 
-a.href =
+link.href =
 URL.createObjectURL(
 blob
 );
 
-a.download =
-`${name.value}.json`;
+link.download =
 
-a.click();
+(levelNameInput.value ||
+"project")
+
++
+
+".json";
+
+link.click();
 
 }
 
@@ -583,8 +641,9 @@ event=>{
 const file =
 event.target.files[0];
 
-if(!file)
+if(!file){
 return;
+}
 
 const reader =
 new FileReader();
@@ -593,34 +652,44 @@ reader.onload =
 ()=>{
 
 const data =
-
 JSON.parse(
 reader.result
 );
 
-name.value =
-data.name;
+levelNameInput.value =
+data.levelName ||
+"My Level";
 
-color.value =
-data.color;
+mainColorInput.value =
+data.mainColor ||
+"Green";
 
-sections.value =
-data.sections;
+sectionsInput.value =
+data.sections ||
+4;
 
-levelLength.value =
-data.levelLength;
+levelLengthInput.value =
+data.levelLength ||
+60;
 
-reaction.value =
-data.reaction;
+reactionInput.value =
+data.reactionTime ||
+1;
 
-practiceStart.value =
-data.practiceStart;
+practiceInput.value =
+data.practiceStart ||
+0;
 
 events.length = 0;
 
+if(data.events){
+
 data.events.forEach(
-e=>events.push(e)
+e=>
+events.push(e)
 );
+
+}
 
 buildScreens();
 
@@ -641,7 +710,7 @@ file
 function updateTimelineRange(){
 
 timeline.max =
-levelLength.value;
+levelLengthInput.value;
 
 updateTimeDisplay();
 
@@ -655,7 +724,7 @@ timeline.value +
 
 "s / " +
 
-levelLength.value +
+levelLengthInput.value +
 
 "s";
 
@@ -669,7 +738,7 @@ updateTimeDisplay
 
 );
 
-levelLength.addEventListener(
+levelLengthInput.addEventListener(
 
 "input",
 
@@ -677,7 +746,7 @@ updateTimelineRange
 
 );
 
-sections.addEventListener(
+sectionsInput.addEventListener(
 
 "change",
 
